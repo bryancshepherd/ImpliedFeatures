@@ -3,19 +3,22 @@
 # Twitter: @bryancshepherd
 # Github: bryancshepherd
 
-jobResultsList = getJobs(c("Python", "SPSS"), 50)
+source("jobSearchFunctions.R")
 
+# Get the job results - this may take a couple of minutes
+jobResultsList = getJobs(c("Python", "SPSS"), nPages=50)
+
+# Clean the data
 cleanedJobData = cleanJobData(jobResultsList)
 
+# Create ordered wordlists for titles and descriptions
 orderedTables = createWordTables(cleanedJobData)
 
+# Create a flat file from the data for easier manipulation and plotting
 flatFile = createFlatFile(orderedTables)
 
+# Use this to write the flat file to csv if needed
 # write.csv(flatFile, "Change Me To Your Preferred Directory", row.names=FALSE)
-
-table(flatFile[, "resultTerms"])
-
-orderedTables[["SPSS"]][["Titles"]]
 
 # Union
 combinedTitleTables = merge(orderedTables[["SPSS"]][["Titles"]], orderedTables[["Python"]][["Titles"]], by = "Var1", all= TRUE, suffixes = c("_SPSS", "_Python"))
@@ -27,14 +30,14 @@ combinedTitleTables$Python_Percent = (combinedTitleTables[,3]/sum(combinedTitleT
 combinedTitleTables$PercentDifference = (combinedTitleTables$Python_Percent - combinedTitleTables$SPSS_Percent)
 combinedTitleTables$RelativePercentDifference = (combinedTitleTables$Python_Percent - combinedTitleTables$SPSS_Percent)/(combinedTitleTables$Python_Percent + combinedTitleTables$SPSS_Percent)
 
-# write.csv(combinedTitleTables, "S:/users/Shepherd/Presentation/SPSS/tableTitles.csv", row.names=FALSE)
+# write.csv(combinedTitleTables, "Your directory here", row.names=FALSE)
 
 
 # Intersection
 # combinedTables = merge(orderedTables[["SPSS"]][["Titles"]], orderedTables[["Python"]][["Titles"]], by = "Var1", suffixes = c("_SPSS", "_Python"))
 
 # Union of popular
-# combinedTables = merge(orderedTables[["SPSS"]][["Titles"]][1:20,], orderedTables[["Python"]][["Titles"]][1:20,], by = "Var1", all= TRUE, suffixes = c("_SPSS", "_Python"))
+combinedTables = merge(orderedTables[["SPSS"]][["Titles"]][1:20,], orderedTables[["Python"]][["Titles"]][1:20,], by = "Var1", all= TRUE, suffixes = c("_SPSS", "_Python"))
 
 combinedTables[is.na(combinedTables)] = 0
 
