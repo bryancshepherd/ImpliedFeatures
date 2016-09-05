@@ -5,8 +5,12 @@
 
 source("jobSearchFunctions.R")
 
+# set search terms
+term1 = "Python"
+term2 = "SPSS"
+
 # Get the job results - this may take a couple of minutes
-jobResultsList = getJobs(c("Python", "SPSS"), nPages=50)
+jobResultsList = getJobs(c(term1, term2), nPages=50)
 
 # Clean the data
 cleanedJobData = cleanJobData(jobResultsList)
@@ -21,17 +25,16 @@ flatFile = createFlatFile(orderedTables)
 # write.csv(flatFile, "Change Me To Your Preferred Directory", row.names=FALSE)
 
 # Union
-combinedTitleTables = merge(orderedTables[["SPSS"]][["Titles"]], orderedTables[["Python"]][["Titles"]], by = "Var1", all= TRUE, suffixes = c("_SPSS", "_Python"))
+combinedTitleTables = merge(orderedTables[[term1]][["Titles"]], orderedTables[[term2]][["Titles"]], by = "Var1", all = TRUE, suffixes = c(paste0("_", term1), paste0("_", term2)))
 combinedTitleTables[is.na(combinedTitleTables)] = 0
 
 # Percent difference
-combinedTitleTables$SPSS_Percent = (combinedTitleTables[,2]/sum(combinedTitleTables[,2])) * 100
-combinedTitleTables$Python_Percent = (combinedTitleTables[,3]/sum(combinedTitleTables[,3])) * 100
-combinedTitleTables$PercentDifference = (combinedTitleTables$Python_Percent - combinedTitleTables$SPSS_Percent)
-combinedTitleTables$RelativePercentDifference = (combinedTitleTables$Python_Percent - combinedTitleTables$SPSS_Percent)/(combinedTitleTables$Python_Percent + combinedTitleTables$SPSS_Percent)
+combinedTitleTables$term1_Percent = (combinedTitleTables[,2]/sum(combinedTitleTables[,2])) * 100
+combinedTitleTables$term2_Percent = (combinedTitleTables[,3]/sum(combinedTitleTables[,3])) * 100
+combinedTitleTables$PercentDifference = (combinedTitleTables$term1_Percent - combinedTitleTables$term2_Percent)
+combinedTitleTables$RelativePercentDifference = (combinedTitleTables$term1_Percent - combinedTitleTables$term2_Percent)/(combinedTitleTables$term1_Percent + combinedTitleTables$term2_Percent)
 
 # write.csv(combinedTitleTables, "Your directory here", row.names=FALSE)
-
 
 # Intersection
 # combinedTables = merge(orderedTables[["SPSS"]][["Titles"]], orderedTables[["Python"]][["Titles"]], by = "Var1", suffixes = c("_SPSS", "_Python"))
